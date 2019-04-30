@@ -1,0 +1,35 @@
+trigger:
+- master
+
+pool:
+  vmImage: 'Ubuntu-16.04'
+
+strategy:
+  matrix:
+    Python35:
+      python.version: '3.5'
+    Python36:
+      python.version: '3.6'
+    Python37:
+      python.version: '3.7'
+
+steps:
+- bash: |
+    sudo apt install -y libgirepository1.0-dev gir1.2-gstreamer-1.0
+
+  name: InstallPackage
+  
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '$(python.version)'
+  displayName: 'Use Python $(python.version)'
+
+- bash: |
+    python -m pip install --upgrade pip
+    pip install -r requirements.txt
+  displayName: 'Install dependencies'
+
+- bash: |
+    pip install pytest pytest-azurepipelines
+    python -m pytest
+  displayName: 'pytest'
