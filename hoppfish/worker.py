@@ -16,16 +16,16 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-from hoppfish.pipeline import Pipeline, GstPipeline
-from gi.repository import GLib, GObject, Gst
+from hoppfish.pipeline import Pipeline
 import threading
-import time
-import uuid
 
+# fmt: off
 import gi
-gi.require_version('Gst', '1.0')
 gi.require_version('GLib', '2.0')
-gi.require_version('GObject', '2.0')
+
+
+from gi.repository import GLib  # noqa: E402
+# fmt: on
 
 
 class Worker(threading.Thread):
@@ -53,10 +53,10 @@ class Worker(threading.Thread):
 
         try:
             self.loop.run()
-        except:
+        except GLib.Error:
             pass
 
-    def add_pipeline(self, pipeline, start=True):
+    def add_pipeline(self, pipeline: Pipeline, start=True):
         self.pipelines[pipeline.uuid] = pipeline
         if start:
             pipeline.play()

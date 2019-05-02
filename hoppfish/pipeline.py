@@ -16,13 +16,15 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import GLib, GObject, Gst
-import uuid
-
+# fmt: off
 import gi
 gi.require_version('Gst', '1.0')
 gi.require_version('GLib', '2.0')
 gi.require_version('GObject', '2.0')
+
+
+from gi.repository import GLib, Gst  # noqa: E402
+# fmt: on
 
 
 class Pipeline:
@@ -36,7 +38,7 @@ class Pipeline:
 
     @uuid.setter
     def uuid(self, uuid):
-        if self._uuid != None:
+        if self._uuid is not None:
             raise ValueError('Can\'t overwrite existing uuid value')
         self._uuid = uuid
 
@@ -60,7 +62,7 @@ class GstPipeline(Pipeline):
         Pipeline.__init__(self, uuid)
 
     def __del__(self):
-        if self._pipeline != None:
+        if self._pipeline is not None:
             self._pipeline.set_state(Gst.State.NULL)
 
     def aborted(self):
