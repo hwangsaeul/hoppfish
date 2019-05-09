@@ -72,12 +72,24 @@ class GstPipeline(Pipeline):
         self.stop(True)
         return False
 
+    def _bus_call(self, bus, message):
+        t = message.type
+        if t == Gst.MessageType.EOS or t == Gst.MessageType.ERROR:
+            GLib.source_remove(self._timeout_id)
+            # TODO: error handling
+            self.stop(True)
+
     def build_pipeline(self, pipeline_description, timeout_ms=5000):
         try:
             self._pipeline = Gst.parse_launch(pipeline_description)
             self._bus = self._pipeline.get_bus()
             self._bus.add_signal_watch()
+            self._bus.connect('message', self._bus_call)
             self._timeout_ms = timeout_ms
+            if self._timeout_ms > 0:
+                self._timeout_id = GLib.timeout_add(
+                    self._timeout_ms, self._timeout)
+
         except GLib.Error as e:
             raise Exception('gst-exception', e.message)
 
