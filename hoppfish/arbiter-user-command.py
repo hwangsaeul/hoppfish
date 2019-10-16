@@ -137,4 +137,4 @@ api.add_resource(record, '/api/v1.0/record/<method>/<edge_id>')
 api.add_resource(vod, '/api/v1.0/vod/<method>/<uid>')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port='8080', debug=True)
