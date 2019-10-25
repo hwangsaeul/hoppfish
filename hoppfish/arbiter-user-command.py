@@ -31,35 +31,58 @@ api = Api(app)
 #########################################
 class srt(Resource):
     def get(self, method, edge_id):
-        return {'url': 'localhost:8888'}
-    def post(self, method, edge_id):
-        obj = dbus.SessionBus().get_object('org.hwangsaeul.Chamge1',
-                '/org/hwangsaeul/Chamge1/Arbiter/Manager')
-        dbus_interface = dbus.Interface(obj,
-                dbus_interface='org.hwangsaeul.Chamge1.Arbiter.Manager')
+        http_ret = 201
+        try:
+            obj = dbus.SessionBus().get_object('org.hwangsaeul.Chamge1',
+                    '/org/hwangsaeul/Chamge1/Arbiter/Manager')
+            dbus_interface = dbus.Interface(obj,
+                    dbus_interface='org.hwangsaeul.Chamge1.Arbiter.Manager')
 
-        command_tail = '\"}'
-        if method == "start":
-            if request.is_json:
-                method = "streamingStart"
+            if method == "url":
+                method = "getUrl"
                 print "method is updated to " + method
-                params = json.dumps(request.get_json())
-                command = '\",\"params\":' + params + '}'
-            else:
-                return "body type is not json", 404
-        elif method == "stop":
-            method = "streamingStop"
-            print "method is updated to " + method
-        elif method == "url":
-            method = "getUrl"
-            print "method is updated to " + method
 
-        command = '{\"method\":\"' + method + '\",\"to\":\"' + edge_id + command_tail
-        print (command)
-        ret = dbus_interface.UserCommand(command)
-        result = ret[0]
-        response = ret[1]
-        return response, 201
+            command = '{\"method\":\"' + method + '\",\"to\":\"' + edge_id + '\"}'
+            print (command)
+            ret = dbus_interface.UserCommand(command)
+            result = ret[0]
+            response = ret[1]
+        except Exception as e:
+            response = str(e);
+            http_ret = 404
+        return response, http_ret
+    def post(self, method, edge_id):
+        http_ret = 201
+        try:
+            obj = dbus.SessionBus().get_object('org.hwangsaeul.Chamge1',
+                    '/org/hwangsaeul/Chamge1/Arbiter/Manager')
+            dbus_interface = dbus.Interface(obj,
+                    dbus_interface='org.hwangsaeul.Chamge1.Arbiter.Manager')
+
+            if method == "start":
+                if request.is_json:
+                    method = "streamingStart"
+                    print "method is updated to " + method
+                    params = json.dumps(request.get_json())
+                    command = '\",\"params\":' + params + '}'
+                else:
+                    return "body type is not json", 404
+            elif method == "stop":
+                method = "streamingStop"
+                print "method is updated to " + method
+            elif method == "url":
+                method = "getUrl"
+                print "method is updated to " + method
+
+            command = '{\"method\":\"' + method + '\",\"to\":\"' + edge_id + '\"}'
+            print (command)
+            ret = dbus_interface.UserCommand(command)
+            result = ret[0]
+            response = ret[1]
+        except Exception as e:
+            response = str(e);
+            http_ret = 404
+        return response, http_ret
 
 #########################################
 # Record Start/Stop
@@ -68,24 +91,29 @@ class srt(Resource):
 #########################################
 class record(Resource):
     def post(self, method, edge_id):
-        obj = dbus.SessionBus().get_object('org.hwangsaeul.Chamge1',
-                '/org/hwangsaeul/Chamge1/Arbiter/Manager')
-        dbus_interface = dbus.Interface(obj,
-                dbus_interface='org.hwangsaeul.Chamge1.Arbiter.Manager')
+        http_ret = 201
+        try:
+            obj = dbus.SessionBus().get_object('org.hwangsaeul.Chamge1',
+                    '/org/hwangsaeul/Chamge1/Arbiter/Manager')
+            dbus_interface = dbus.Interface(obj,
+                    dbus_interface='org.hwangsaeul.Chamge1.Arbiter.Manager')
 
-        if method == "start":
-            method = "recordStart"
-        elif method == "stop":
-            method = "recordStop"
+            if method == "start":
+                method = "recordStart"
+            elif method == "stop":
+                method = "recordStop"
 
-        # TODO
-        # replace edge_id to hub_id here or agent'r roll?
-        command = '{\"method\":\"' + method + '\",\"to\":\"' + edge_id + '\"}'
-        print (command)
-        ret = dbus_interface.UserCommand(command)
-        result = ret[0]
-        response = ret[1]
-        return response, 201
+            # TODO
+            # replace edge_id to hub_id here or agent'r roll?
+            command = '{\"method\":\"' + method + '\",\"to\":\"' + edge_id + '\"}'
+            print (command)
+            ret = dbus_interface.UserCommand(command)
+            result = ret[0]
+            response = ret[1]
+        except Exception as e:
+            response = str(e);
+            http_ret = 404
+        return response, http_ret
 
 #########################################
 # VOD Service 
@@ -95,36 +123,41 @@ class record(Resource):
 #########################################
 class vod(Resource):
     def get(self, method, uid):
-        obj = dbus.SessionBus().get_object('org.hwangsaeul.Chamge1',
-                '/org/hwangsaeul/Chamge1/Arbiter/Manager')
-        dbus_interface = dbus.Interface(obj,
-                dbus_interface='org.hwangsaeul.Chamge1.Arbiter.Manager')
-        id_type = "edge_id"
+        http_ret = 201
+        try:
+            obj = dbus.SessionBus().get_object('org.hwangsaeul.Chamge1',
+                    '/org/hwangsaeul/Chamge1/Arbiter/Manager')
+            dbus_interface = dbus.Interface(obj,
+                    dbus_interface='org.hwangsaeul.Chamge1.Arbiter.Manager')
+            id_type = "edge_id"
 
-        if method == "lookup-by-record":
-            method = "lookupByRecord"
-            id_type = "record_id"
-            from_str = request.args.get('start', type = str)
-            to_str = request.args.get('end', type = str)
-            print (from_str)
-            print (to_str)
-        elif method == "lookup-by-edge":
-            method = "lookupByEdge"
-            from_str = request.args.get('start', type = str)
-            to_str = request.args.get('end', type = str)
-            print (from_str)
-            print (to_str)
-        elif method =="url":
-            method = "getUrl"
+            if method == "lookup-by-record":
+                method = "lookupByRecord"
+                id_type = "record_id"
+                from_str = request.args.get('start', type = str)
+                to_str = request.args.get('end', type = str)
+                print (from_str)
+                print (to_str)
+            elif method == "lookup-by-edge":
+                method = "lookupByEdge"
+                from_str = request.args.get('start', type = str)
+                to_str = request.args.get('end', type = str)
+                print (from_str)
+                print (to_str)
+            elif method =="url":
+                method = "getUrl"
 
-        # TODO
-        # replace edge_id to hub_id here or agent'r roll?
-        command = '{\"method\":\"' + method + '\",\"to\":\"' + uid + '\"}'
-        print (command)
-        ret = dbus_interface.UserCommand(command)
-        result = ret[0]
-        response = ret[1]
-        return response, 201
+            # TODO
+            # replace edge_id to hub_id here or agent'r roll?
+            command = '{\"method\":\"' + method + '\",\"to\":\"' + uid + '\"}'
+            print (command)
+            ret = dbus_interface.UserCommand(command)
+            result = ret[0]
+            response = ret[1]
+        except Exception as e:
+            response = str(e);
+            http_ret = 404
+        return response, http_ret
     def delete(self, method, uid):
         # TODO
         # implement to create command and invoke UserCommand
