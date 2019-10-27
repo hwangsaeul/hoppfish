@@ -40,7 +40,7 @@ class srt(Resource):
 
             if method == "url":
                 method = "getUrl"
-                print "method is updated to " + method
+                print ("method is updated to " + method)
 
             command = '{\"method\":\"' + method + '\",\"to\":\"' + edge_id + '\"}'
             print (command)
@@ -59,22 +59,23 @@ class srt(Resource):
             dbus_interface = dbus.Interface(obj,
                     dbus_interface='org.hwangsaeul.Chamge1.Arbiter.Manager')
 
+            command_tail = '\"}'
             if method == "start":
                 if request.is_json:
                     method = "streamingStart"
-                    print "method is updated to " + method
+                    print ("method is updated to " + method)
                     params = json.dumps(request.get_json())
-                    command = '\",\"params\":' + params + '}'
+                    command_tail = '\",\"params\":' + params + '}'
                 else:
                     return "body type is not json", 404
             elif method == "stop":
                 method = "streamingStop"
-                print "method is updated to " + method
+                print ("method is updated to " + method)
             elif method == "url":
                 method = "getUrl"
-                print "method is updated to " + method
+                print ("method is updated to " + method)
 
-            command = '{\"method\":\"' + method + '\",\"to\":\"' + edge_id + '\"}'
+            command = '{\"method\":\"' + method + '\",\"to\":\"' + edge_id + command_tail
             print (command)
             ret = dbus_interface.UserCommand(command)
             result = ret[0]
