@@ -24,8 +24,9 @@ jobs:
           gstreamer1.0-plugins-good \
           gstreamer1.0-plugins-ugly \
           libgirepository1.0-dev \
-          gir1.2-gstreamer-1.0
-  
+          gir1.2-gstreamer-1.0 \
+          libcairo2-dev
+
     name: InstallPackage
     
   - task: UsePythonVersion@0
@@ -35,6 +36,7 @@ jobs:
   
   - bash: |
       python -m pip install --upgrade pip
+      pip install wheel
       pip install -r requirements.txt
     displayName: 'Install dependencies'
   
@@ -53,6 +55,9 @@ jobs:
 
   - bash: |
       source ./venv/bin/activate
+      sudo apt-get update && sudo apt-get install -y libcairo2-dev
+      python -m pip install --upgrade pip
+      pip install wheel
       pip install -r requirements.txt
     displayName: 'Install dependencies'
 
