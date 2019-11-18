@@ -162,7 +162,7 @@ class vod(Resource):
     def delete(self, method, uid):
         # TODO
         # implement to create command and invoke UserCommand
-        print "[delete] edge id: " + method + ", file id : " + uid
+        print ("[delete] edge id: " + method + ", file id : " + uid)
         response = "not impemented, yet"
         return response, 201
 
