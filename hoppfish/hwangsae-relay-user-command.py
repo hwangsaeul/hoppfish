@@ -42,7 +42,7 @@ class srt(Resource):
     def post(self, method, edge_id):
         http_ret = 201
         try:
-            obj = dbus.SessionBus().get_object('org.hwangsaeul.Hwangsae1',
+            obj = dbus.SessionBus().get_object('org.hwangsaeul.Hwangsae1.RelayAgent',
                     '/org/hwangsaeul/Hwangsae1/EdgeInterface')
             dbus_interface = dbus.Interface(obj,
                     dbus_interface='org.hwangsaeul.Hwangsae1.EdgeInterface')
