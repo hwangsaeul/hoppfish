@@ -48,14 +48,14 @@ class srt(Resource):
                     dbus_interface='org.hwangsaeul.Hwangsae1.RecorderInterface')
 
             ret = ''
+            response = json.loads('{}')
             if method == "start":
                 ret = dbus_interface.Start(edge_id)
                 print("ret:", ret)
+                response = json.loads('{"recordId": "' + ret + '"}')
             elif method == "stop":
                 ret = dbus_interface.Stop(edge_id)
                 print("ret:", ret)
-
-            response = json.loads('{"recordId": "' + ret + '"}')
 
         except Exception as e:
             print ('Exception:', e)
