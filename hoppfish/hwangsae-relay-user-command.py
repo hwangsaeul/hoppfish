@@ -63,6 +63,17 @@ class srt(Resource):
             elif method == "stop":
                 ret = dbus_interface.Stop(edge_id)
                 print("ret:", ret)
+            elif method == "change-parameters":
+                if not request.is_json:
+                    return "body type is not json", 404
+
+                body = request.get_json()
+                print("body:", str(body))
+                width = get_json_value(body, 'width', 0)
+                height = get_json_value(body, 'height', 0)
+                fps = get_json_value(body, 'fps', 0)
+                dbus_interface.ChangeParameters(edge_id, width, height, fps)
+                http_ret = 200
 
             response = json.loads('{"url": "' + ret + '"}')
 
