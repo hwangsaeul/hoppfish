@@ -69,10 +69,14 @@ class srt(Resource):
 
                 body = request.get_json()
                 print("body:", str(body))
-                width = get_json_value(body, 'width', 0)
-                height = get_json_value(body, 'height', 0)
-                fps = get_json_value(body, 'fps', 0)
-                dbus_interface.ChangeParameters(edge_id, width, height, fps)
+                dbus_interface.ChangeParameters(
+                    edge_id,
+                    get_json_value(body, 'width', 0),
+                    get_json_value(body, 'height', 0),
+                    get_json_value(body, 'fps', 0),
+                    get_json_value(body, 'bitrate', 0)
+                )
+
                 http_ret = 200
 
             response = json.loads('{"url": "' + ret + '"}')
