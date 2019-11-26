@@ -63,7 +63,7 @@ class srt(Resource):
             http_ret = 404
         return response, http_ret
 
-api.add_resource(srt, '/api/v1.0/srt/<method>/<edge_id>')
+api.add_resource(srt, '/api/v1.0/record/<method>/<edge_id>')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port='8080', debug=True)
+    app.run(host='0.0.0.0', port='9090', debug=True)
