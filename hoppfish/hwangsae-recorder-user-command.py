@@ -135,8 +135,52 @@ class vod(Resource):
 
         return response, http_ret
 
+class vod_url(Resource):
+    def get(self, method, edge_id, file_id):
+        http_ret = 201
+        try:
+            obj = dbus.SessionBus().get_object('org.hwangsaeul.Hwangsae1.RecorderAgent',
+                    '/org/hwangsaeul/Hwangsae1/RecorderInterface')
+            dbus_interface = dbus.Interface(obj,
+                    dbus_interface='org.hwangsaeul.Hwangsae1.RecorderInterface')
+
+            ret = ''
+            if method == 'url':
+                ret = dbus_interface.Url(edge_id, file_id)
+                ret = json.dumps({'url': ret})
+
+            response = ret
+
+        except Exception as e:
+            print ('Exception:', e)
+            response = "internal error"
+            http_ret = 404
+
+        return response, http_ret
+
+class vod_delete(Resource):
+    def delete(self, edge_id, file_id):
+        http_ret = 201
+        try:
+            obj = dbus.SessionBus().get_object('org.hwangsaeul.Hwangsae1.RecorderAgent',
+                    '/org/hwangsaeul/Hwangsae1/RecorderInterface')
+            dbus_interface = dbus.Interface(obj,
+                    dbus_interface='org.hwangsaeul.Hwangsae1.RecorderInterface')
+
+            dbus_interface.Delete(edge_id, file_id)
+            response = ''
+
+        except Exception as e:
+            print ('Exception:', e)
+            response = "internal error"
+            http_ret = 404
+
+        return response, http_ret
+
 api.add_resource(srt, '/api/v1.0/record/<method>/<edge_id>')
 api.add_resource(vod, '/api/v1.0/vod/<method>')
+api.add_resource(vod_url, '/api/v1.0/vod/<method>/<edge_id>/<file_id>')
+api.add_resource(vod_delete, '/api/v1.0/vod/<edge_id>/<file_id>')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port='9090', debug=True)
