@@ -131,7 +131,6 @@ class vod(Resource):
             print ('Exception:', e)
             response = "internal error"
             http_ret = 404
-        return response, http_ret
 
         return response, http_ret
 
