@@ -96,6 +96,7 @@ class vod(Resource):
                       'end': f[2],
                       'size': f[3]
                     }
+                    file_list_ret.append(file_data)
                 ret['fileList'] = file_list_ret
                 ret = json.dumps(ret)
 
