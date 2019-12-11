@@ -56,6 +56,8 @@ class srt(Resource):
                     height = get_json_value(body, 'height', 0)
                     fps = get_json_value(body, 'fps', 0)
                     bitrate = get_json_value(body, 'bitrates', 0)
+                    if (bitrate == 0):
+                        bitrate = get_json_value(body, 'bitrate', 0)
                     ret = dbus_interface.Start(edge_id, width, height, fps, bitrate)
                     print("ret:", ret)
                 else:
@@ -69,12 +71,15 @@ class srt(Resource):
 
                 body = request.get_json()
                 print("body:", str(body))
+                bitrate = get_json_value(body, 'bitrates', 0)
+                if bitrate == 0:
+                    bitrate = get_json_value(body, 'bitrate', 0)
                 dbus_interface.ChangeParameters(
                     edge_id,
                     get_json_value(body, 'width', 0),
                     get_json_value(body, 'height', 0),
                     get_json_value(body, 'fps', 0),
-                    get_json_value(body, 'bitrates', 0)
+                    bitrate
                 )
 
                 http_ret = 200
