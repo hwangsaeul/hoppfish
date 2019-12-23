@@ -14,7 +14,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from flask import Flask
+from flask import Flask, jsonify, make_response
 from flask_restful import request, abort, Api, Resource
 import dbus
 import json
@@ -31,6 +31,9 @@ def get_json_value(obj, key, default):
 
     return ret
 
+def make_internal_error():
+    return make_response(jsonify(message='internal error'), 404)
+
 #########################################
 # Live Streaming
 # POST
@@ -40,7 +43,6 @@ def get_json_value(obj, key, default):
 #########################################
 class srt(Resource):
     def post(self, method, edge_id):
-        http_ret = 201
         try:
             obj = dbus.SessionBus().get_object('org.hwangsaeul.Hwangsae1.RecorderAgent',
                     '/org/hwangsaeul/Hwangsae1/RecorderInterface')
@@ -48,24 +50,23 @@ class srt(Resource):
                     dbus_interface='org.hwangsaeul.Hwangsae1.RecorderInterface')
 
             ret = ''
-            response = json.loads('{}')
+            response = make_response(jsonify(), 201)
             if method == "start":
                 ret = dbus_interface.Start(edge_id)
                 print("ret:", ret)
-                response = json.loads('{"recordId": "' + ret + '"}')
+                response = make_response(jsonify(recordId=ret), 201)
             elif method == "stop":
                 ret = dbus_interface.Stop(edge_id)
                 print("ret:", ret)
 
         except Exception as e:
             print ('Exception:', e)
-            response = "internal error"
-            http_ret = 404
-        return response, http_ret
+            response = make_internal_error()
+
+        return response
 
 class vod(Resource):
     def get(self, method):
-        http_ret = 201
         try:
             obj = dbus.SessionBus().get_object('org.hwangsaeul.Hwangsae1.RecorderAgent',
                     '/org/hwangsaeul/Hwangsae1/RecorderInterface')
@@ -98,7 +99,6 @@ class vod(Resource):
                     }
                     file_list_ret.append(file_data)
                 ret['fileList'] = file_list_ret
-                ret = json.dumps(ret)
 
             elif method == 'lookup-by-edge':
                 edge_id = request.args.get('edgeId')
@@ -124,43 +124,36 @@ class vod(Resource):
                     }
                     file_list_ret.append(file_data)
                 ret['fileList'] = file_list_ret
-                ret = json.dumps(ret)
 
-            response = ret
+            response = make_response(jsonify(ret), 200)
 
         except Exception as e:
             print ('Exception:', e)
-            response = "internal error"
-            http_ret = 404
+            response = make_internal_error()
 
-        return response, http_ret
+        return response
 
 class vod_url(Resource):
     def get(self, method, edge_id, file_id):
-        http_ret = 201
         try:
             obj = dbus.SessionBus().get_object('org.hwangsaeul.Hwangsae1.RecorderAgent',
                     '/org/hwangsaeul/Hwangsae1/RecorderInterface')
             dbus_interface = dbus.Interface(obj,
                     dbus_interface='org.hwangsaeul.Hwangsae1.RecorderInterface')
 
-            ret = ''
+            response = make_response(jsonify(), 200)
             if method == 'url':
                 ret = dbus_interface.Url(edge_id, file_id)
-                ret = json.dumps({'url': ret})
-
-            response = ret
+                response = make_response(jsonify(url=ret), 200)
 
         except Exception as e:
             print ('Exception:', e)
-            response = "internal error"
-            http_ret = 404
+            response = make_internal_error()
 
-        return response, http_ret
+        return response
 
 class vod_delete(Resource):
     def delete(self, edge_id, file_id):
-        http_ret = 201
         try:
             obj = dbus.SessionBus().get_object('org.hwangsaeul.Hwangsae1.RecorderAgent',
                     '/org/hwangsaeul/Hwangsae1/RecorderInterface')
@@ -168,14 +161,13 @@ class vod_delete(Resource):
                     dbus_interface='org.hwangsaeul.Hwangsae1.RecorderInterface')
 
             dbus_interface.Delete(edge_id, file_id)
-            response = ''
+            response = make_response(jsonify(), 200)
 
         except Exception as e:
             print ('Exception:', e)
-            response = "internal error"
-            http_ret = 404
+            response = make_internal_error()
 
-        return response, http_ret
+        return response
 
 api.add_resource(srt, '/api/v1.0/record/<method>/<edge_id>')
 api.add_resource(vod, '/api/v1.0/vod/<method>')
